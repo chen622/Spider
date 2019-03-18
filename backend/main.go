@@ -1,11 +1,12 @@
 package main
 
 import (
+	"./mail"
+	"./spider"
 	"fmt"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/middleware/logger"
 	"github.com/kataras/iris/middleware/recover"
-	"iris-start/spider"
 )
 
 func main() {
@@ -20,17 +21,16 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		list, err := spider.GetVideoList(mid)
+		author, list, err := spider.GetVideoList(mid)
 		if err != nil {
 			panic(err)
 		}
-		html := ""
-		for _, video := range list {
-			html += fmt.Sprint("<h1>",video.Title,"<\\h1>")
-			html += fmt.Sprint("<h3>视频发布于 ",video.GetTime().Format("2006-01-02 15:04:05"),"<\\h3>")
-			html += "<\\br><\\br>"
+		fmt.Println(list)
+		if err := mail.Bilibili(author, list); err != nil {
+			panic(err)
 		}
-		ctx.HTML(html)
+		fmt.Println("Bilibili ‘", author, "’更新推送成功！")
+		ctx.HTML("<h1>推送成功</h1>")
 	})
 	//输出字符串
 	// 类似于 app.Handle("GET", "/ping", [...])

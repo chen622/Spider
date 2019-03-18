@@ -10,11 +10,13 @@ import (
 )
 
 type Video struct {
-	Author  string `jpath:"author"`
-	Mid     int    `jpath:"mid"`
-	Aid     int    `jpath:"aid"`
-	Title   string `jpath:"title"`
-	Created int64 `jpath:"created"`
+	Author      string `jpath:"author"`
+	Mid         int    `jpath:"mid"`
+	Aid         int    `jpath:"aid"`
+	Title       string `jpath:"title"`
+	Created     int64  `jpath:"created"`
+	Description string `jpath:"description"`
+	Pic         string `jpath:"pic"`
 }
 
 func (v Video) GetTime() time.Time {
@@ -29,11 +31,11 @@ type Bilibili struct {
 
 const BILIBILI = "https://space.bilibili.com/ajax/member/getSubmitVideos?mid="
 
-func GetVideoList(mid int) (list []Video, err error) {
+func GetVideoList(mid int) (author string, list []Video, err error) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", fmt.Sprint(BILIBILI, mid), nil)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36=anny")
 	req.Header.Set("Accept", "application/json, text/plain, */*")
@@ -41,7 +43,7 @@ func GetVideoList(mid int) (list []Video, err error) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	var dat map[string]interface{}
@@ -52,9 +54,9 @@ func GetVideoList(mid int) (list []Video, err error) {
 	if dat["status"].(bool) {
 		var bilibili Bilibili
 		mapstructure.DecodePath(dat, &bilibili)
-		return bilibili.Vlist, nil
+		return bilibili.Vlist[0].Author, bilibili.Vlist, nil
 	} else {
-		return nil, SpiderError{fmt.Sprint(BILIBILI, mid), dat["msg"].(string)}
+		return "", nil, SpiderError{fmt.Sprint(BILIBILI, mid), dat["msg"].(string)}
 	}
 }
 
