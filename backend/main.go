@@ -1,8 +1,8 @@
 package main
 
 import (
-	"./mail"
-	"./spider"
+	"./service/mail"
+	"./service/spider"
 	"fmt"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/middleware/logger"

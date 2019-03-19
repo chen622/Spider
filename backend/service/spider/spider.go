@@ -1,39 +1,24 @@
 package spider
 
 import (
+	"../../model"
 	"encoding/json"
 	"fmt"
 	"github.com/goinggo/mapstructure"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
 
-type Video struct {
-	Author      string `jpath:"author"`
-	Mid         int    `jpath:"mid"`
-	Aid         int    `jpath:"aid"`
-	Title       string `jpath:"title"`
-	Created     int64  `jpath:"created"`
-	Description string `jpath:"description"`
-	Pic         string `jpath:"pic"`
-}
-
-func (v Video) GetTime() time.Time {
-	unix := time.Unix(v.Created, 0)
-	return unix
-}
-
 type Bilibili struct {
-	Status bool    `jpath:"status"`
-	Vlist  []Video `jpath:"data.vlist"`
+	Status bool          `jpath:"status"`
+	Vlist  []model.Video `jpath:"data.vlist"`
 }
 
 const BILIBILI = "https://space.bilibili.com/ajax/member/getSubmitVideos?mid="
 
-func GetVideoList(mid int) (author string, list []Video, err error) {
+func GetVideoList(mid int) (author string, list []model.Video, err error) {
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", fmt.Sprint(BILIBILI, mid), nil)
+	req, err := http.NewRequest("GET", fmt.Sprint(BILIBILI, mid, "&pagesize=5&page=1"), nil)
 	if err != nil {
 		return "", nil, err
 	}
