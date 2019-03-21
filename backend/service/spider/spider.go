@@ -10,17 +10,17 @@ import (
 )
 
 type Bilibili struct {
-	Status bool          `jpath:"status"`
-	Vlist  []model.Video `jpath:"data.vlist"`
+	Status bool                  `jpath:"status"`
+	Vlist  []model.BilibiliVideo `jpath:"data.vlist"`
 }
 
 const BILIBILI = "https://space.bilibili.com/ajax/member/getSubmitVideos?mid="
 
-func GetVideoList(mid int) (author string, list []model.Video, err error) {
+func GetVideoList(mid int64) (list []model.BilibiliVideo, err error) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", fmt.Sprint(BILIBILI, mid, "&pagesize=5&page=1"), nil)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36=anny")
 	req.Header.Set("Accept", "application/json, text/plain, */*")
@@ -28,7 +28,7 @@ func GetVideoList(mid int) (author string, list []model.Video, err error) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 
 	var dat map[string]interface{}
@@ -39,9 +39,12 @@ func GetVideoList(mid int) (author string, list []model.Video, err error) {
 	if dat["status"].(bool) {
 		var bilibili Bilibili
 		mapstructure.DecodePath(dat, &bilibili)
-		return bilibili.Vlist[0].Author, bilibili.Vlist, nil
+		for index, video := range bilibili.Vlist {
+			bilibili.Vlist[index].Pic = fmt.Sprint("http:", video.Pic)
+		}
+		return bilibili.Vlist, nil
 	} else {
-		return "", nil, SpiderError{fmt.Sprint(BILIBILI, mid), dat["msg"].(string)}
+		return nil, SpiderError{fmt.Sprint(BILIBILI, mid), dat["msg"].(string)}
 	}
 }
 

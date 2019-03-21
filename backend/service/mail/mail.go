@@ -14,7 +14,7 @@ var (
 	to       = "745478424@qq.com"
 )
 
-func Bilibili(author string, list []model.Video) error {
+func Bilibili(author string, list []model.BilibiliVideo) error {
 	html := ""
 	html += htmlHeader
 	for _, video := range list {

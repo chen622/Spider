@@ -1,9 +1,12 @@
 package main
 
 import (
+	"./model"
 	"./service/mail"
 	"./service/spider"
 	"fmt"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/middleware/logger"
 	"github.com/kataras/iris/middleware/recover"
@@ -13,23 +16,37 @@ func main() {
 	app := iris.New()
 	app.Use(recover.New())
 	app.Use(logger.New())
-	//输出html
-	// 请求方式: GET
-	// 访问地址: http://localhost:8080/welcome
+	db, err := gorm.Open("mysql", "root:980528@/ccm?charset=utf8&parseTime=True&loc=Local")
+	db.SingularTable(true)
+	if err != nil {
+		panic(err)
+	}
 	app.Handle("GET", "/bili/{mid:int}", func(ctx iris.Context) {
-		mid, err := ctx.Params().GetInt("mid")
+		mid, err := ctx.Params().GetInt64("mid")
 		if err != nil {
 			panic(err)
 		}
-		author, list, err := spider.GetVideoList(mid)
+		up := model.BilibiliUp{Mid: mid}
+		db.First(&up)
+		if up.Name == "" {
+			ctx.WriteString("No record")
+			return
+		}
+
+		list, err := spider.GetVideoList(mid)
 		if err != nil {
 			panic(err)
 		}
 		fmt.Println(list)
-		if err := mail.Bilibili(author, list); err != nil {
+		for _, video := range list {
+			db.NewRecord(video)
+			db.Create(&video)
+			fmt.Println(video)
+		}
+		if err := mail.Bilibili(up.Name, list); err != nil {
 			panic(err)
 		}
-		fmt.Println("Bilibili ‘", author, "’更新推送成功！")
+		fmt.Println("Bilibili ‘", up.Name, "’更新推送成功！")
 		ctx.HTML("<h1>推送成功</h1>")
 	})
 	//输出字符串
