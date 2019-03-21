@@ -2,6 +2,7 @@ package main
 
 import (
 	"./model"
+	"./sercet"
 	"./service/mail"
 	"./service/spider"
 	"fmt"
@@ -16,7 +17,8 @@ func main() {
 	app := iris.New()
 	app.Use(recover.New())
 	app.Use(logger.New())
-	db, err := gorm.Open("mysql", "root:980528@/ccm?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open(sercet.DB["type"], sercet.DB["url"])
+
 	db.SingularTable(true)
 	if err != nil {
 		panic(err)

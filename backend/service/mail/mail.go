@@ -2,16 +2,17 @@ package mail
 
 import (
 	"../../model"
+	"../../sercet"
 	"fmt"
 	"net/smtp"
 	"strings"
 )
 
 var (
-	user     = "lucky98622@gmail.com"
-	password = "qfpjdzuzakenbuss"
-	host     = "smtp.gmail.com:587"
-	to       = "745478424@qq.com"
+	user     = sercet.Mail["user"].(string)
+	password = sercet.Mail["password"].(string)
+	host     = sercet.Mail["host"].(string)
+	to       = sercet.Mail["to"].(string)
 )
 
 func Bilibili(author string, list []model.BilibiliVideo) error {

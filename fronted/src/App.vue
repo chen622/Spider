@@ -7,7 +7,7 @@
                     text-color="#409EFF"
                     active-text-color="#67C23A"
                     class="top-nav">
-                <el-menu-item class="logo-title">CCM</el-menu-item>
+                <el-menu-item class="logo-title">Cloud Messaging</el-menu-item>
                 <el-menu-item class="nav-title" index="4"><a href="" target="_blank">GitHub</a>
                 </el-menu-item>
                 <el-menu-item class="nav-title" index="3" disabled>消息中心</el-menu-item>
@@ -34,18 +34,39 @@
                 <el-row type="flex" justify="center">
                     <el-col :span="24">
                         <h1>CCM Is CCM Cloud Messaging!</h1>
-                        <h2>Make Android Better By Pushing message to Android Phone In China!</h2>
+                        <h2>Make Android Better By Pushing Message To Android Phone In China!</h2>
                     </el-col>
                 </el-row>
             </div>
             <el-row type="flex" justify="center">
-                <el-col :span="16">
-                    <el-card shadow="hover">
+                <el-col :span="18">
+                    <el-card shadow="hover" class="home-image-card">
                         <img class="home-image" src="./assets/img/android.jpg">
                     </el-card>
                 </el-col>
             </el-row>
-
+            <div class="block home-timeline">
+                <el-timeline>
+                    <el-timeline-item timestamp="2018/4/12" placement="top">
+                        <el-card>
+                            <h4>更新 Github 模板</h4>
+                            <p>王小虎 提交于 2018/4/12 20:46</p>
+                        </el-card>
+                    </el-timeline-item>
+                    <el-timeline-item timestamp="2018/4/3" placement="top">
+                        <el-card>
+                            <h4>更新 Github 模板</h4>
+                            <p>王小虎 提交于 2018/4/3 20:46</p>
+                        </el-card>
+                    </el-timeline-item>
+                    <el-timeline-item timestamp="2018/4/2" placement="top">
+                        <el-card>
+                            <h4>更新 Github 模板</h4>
+                            <p>王小虎 提交于 2018/4/2 20:46</p>
+                        </el-card>
+                    </el-timeline-item>
+                </el-timeline>
+            </div>
         </el-main>
 
         <el-footer>
@@ -83,12 +104,17 @@
         /*line-height: 80px !important;*/
         float: left !important;
         font-size: 30px !important;
+        font-weight: bold;
     }
 
     .nav-title {
         height: 65px !important;
         /*line-height: 80px !important;*/
         float: right !important;
+    }
+
+    .home-image-card {
+        border: none!important;
     }
 
     .home-image {
@@ -109,5 +135,9 @@
         margin-top: 10px;
         font-size: large;
         color: #888;
+    }
+
+    .home-timeline {
+        margin-top: 40px;
     }
 </style>
