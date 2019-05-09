@@ -1,7 +1,0 @@
-[app]
-    port = ":8080"
-    debug = true
-[mysql]
-    url = "ccm:Jjfjj980528!@@tcp(34.80.231.142:3306)/ccm2?charset=utf8&parseTime=True&loc=Local"
-[database]
-    driver = "mysql"
