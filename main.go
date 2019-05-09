@@ -24,6 +24,22 @@ func main() {
 		panic(err)
 	}
 
+	//通过Up主mid获取个人信息
+	app.Handle("GET", "/bili/up/{mid:int}", func(ctx iris.Context) {
+		mid, err := ctx.Params().GetInt64("mid")
+		if err != nil {
+			panic(err)
+		}
+
+		up, err := spider.GetUpInfo(mid)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(up)
+		fmt.Println("Bilibili ‘", up.Name, "’获取成功！")
+		ctx.JSON(up)
+	})
+
 	app.Handle("GET", "/bili/{mid:int}", func(ctx iris.Context) {
 		mid, err := ctx.Params().GetInt64("mid")
 		if err != nil {
