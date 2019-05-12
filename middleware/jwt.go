@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"Spider/config"
 	"Spider/utils"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -19,7 +20,7 @@ var (
 func New() *jwtmiddleware.Middleware {
 	return jwtmiddleware.New(jwtmiddleware.Config{
 		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-			return []byte("neu"), nil
+			return []byte(config.Conf.Get("secret.key").(string)), nil
 		},
 		SigningMethod: jwt.SigningMethodHS256,
 	})
@@ -49,7 +50,7 @@ func CreateToken(userId uint) (tokenString string) {
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString([]byte("neu"))
+	tokenString, err := token.SignedString([]byte(config.Conf.Get("secret.key").(string)))
 	if err != nil {
 		panic(fmt.Sprintln(err.Error()))
 	}
