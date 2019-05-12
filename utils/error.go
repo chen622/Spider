@@ -7,6 +7,11 @@ type Error struct {
 	Msg  string `json:"msg"`
 }
 
+func E_201() (err *Error) {
+	err = &Error{Code: 201, Msg: "未开放注册!"}
+	return
+}
+
 //E_402 表单验证错误
 func E_402(errMap map[string]interface{}) (err *Error) {
 	msg, _ := json.Marshal(errMap)
@@ -19,13 +24,13 @@ func E_403() (err *Error) {
 	return
 }
 
-func E_405() (err *Error) {
-	err = &Error{Code: 405, Msg: "用户名已被使用!"}
+func E_404() (err *Error) {
+	err = &Error{Code: 404, Msg: "未找到目标！"}
 	return
 }
 
-func E_404() (err *Error) {
-	err = &Error{Code: 404, Msg: "未找到目标！"}
+func E_405() (err *Error) {
+	err = &Error{Code: 405, Msg: "用户名已被使用!"}
 	return
 }
 
