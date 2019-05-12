@@ -3,8 +3,8 @@ package model
 import (
 	"Spider/database"
 	"fmt"
-	"github.com/jameskeane/bcrypt"
 	"github.com/jinzhu/gorm"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -20,22 +20,23 @@ type User struct {
  * @method UserAdminCheckLogin
  * @param  {[type]}       username string [description]
  */
-func UserAdminCheckLogin(username string) User {
-	u := User{}
+func UserAdminCheckLogin(username string) (*User, error) {
+	u := &User{}
 	if err := database.DB.Where("username = ?", username).First(&u).Error; err != nil {
-		fmt.Printf("UserAdminCheckLoginErr:%s", err)
+		return nil, err
 	}
-	return u
+	return u, nil
 }
 
 /**
  * 创建
  */
 func CreateUser(user *User) (*User, error) {
-	salt, _ := bcrypt.Salt(10)
-	hash, _ := bcrypt.Hash(user.Password, salt)
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return user, err
+	}
 	user.Password = string(hash)
-
 	if err := database.DB.Create(user).Error; err != nil {
 		fmt.Printf("CreateUserErr:%s", err)
 		return user, err
@@ -43,9 +44,14 @@ func CreateUser(user *User) (*User, error) {
 	return user, nil
 }
 
-func FindUserByUsername(username string) (user *User) {
-	if database.DB.Where("username = ?", username).First(&user).RecordNotFound() {
-		return nil
-	}
+func FindUserByUsername(username string) *User {
+	user := &User{}
+	database.DB.Where("username = ?", username).First(&user)
+	return user
+}
+
+func FindUserById(id uint) *User {
+	user := &User{}
+	database.DB.First(&user, id)
 	return user
 }

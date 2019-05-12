@@ -7,6 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	jwtmiddleware "github.com/iris-contrib/middleware/jwt"
 	"github.com/kataras/iris"
+	"time"
 )
 
 var (
@@ -35,11 +36,12 @@ func AuthToken(ctx iris.Context) {
 			ctx.Values().Set("userId", userId)
 			ctx.Next()
 		} else {
+			ctx.StatusCode(401)
 			ctx.JSON(utils.TokenInvalid("token 已经过期"))
 		}
 	} else {
+		ctx.StatusCode(401)
 		ctx.JSON(utils.TokenInvalid("token 无效"))
-
 		return
 	}
 }
@@ -47,6 +49,8 @@ func AuthToken(ctx iris.Context) {
 func CreateToken(userId uint) (tokenString string) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userId": userId,
+		"exp":    time.Now().Add(time.Hour * time.Duration(1)).Unix(),
+		"iat":    time.Now().Unix(),
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
