@@ -22,3 +22,4 @@ yarn-error.log*
 
 sercet/sercet.go
 /config/config.toml
+/config/config_production.toml
