@@ -46,6 +46,10 @@ func newApp() (app *iris.Application) {
 		users.Use(middleware.MyJwtMiddleware.Serve, middleware.AuthToken)
 		users.Get("/info", controller.UserInfo)
 	})
+	ccm.PartyFunc("/bilibili", func(users iris.Party) {
+		users.Use(middleware.MyJwtMiddleware.Serve, middleware.AuthToken)
+		users.Get("/up", controller.GetUpInfo)
+	})
 
 	return
 }

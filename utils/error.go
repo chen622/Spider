@@ -39,6 +39,11 @@ func E_500() (err *Error) {
 	return
 }
 
+func E_501() (err *Error) {
+	err = &Error{Code: 501, Msg: "参数错误！"}
+	return
+}
+
 func E_All() (err *Error) {
 	err = &Error{Code: 0, Msg: "抱歉！请求异常，请重试"}
 	return

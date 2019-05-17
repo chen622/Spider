@@ -3,12 +3,15 @@ package model
 import (
 	"Spider/database"
 	"fmt"
-	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 type User struct {
-	gorm.Model
+	ID         uint `gorm:"primary_key"`
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	DeletedAt  *time.Time   `sql:"index"`
 	Username   string       `gorm:"column:username;size:64;not null;unique" json:"username" validate:"required,gte=4,lte=64"`
 	Password   string       `gorm:"column:password;size:255;not null" json:"password" validate:"required,gte=7,lte=256"`
 	Mail       string       `gorm:"column:mail;size:128;not null" json:"email" validate:"email"`
