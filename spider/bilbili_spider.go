@@ -3,6 +3,7 @@ package spider
 import (
 	"Spider/database"
 	"Spider/model"
+	"Spider/picture"
 	"encoding/json"
 	"fmt"
 	"github.com/mitchellh/mapstructure"
@@ -23,7 +24,7 @@ func GetUpInfo(mid int64) (*model.BilibiliUp, error) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", fmt.Sprint(bilibili_up_info, mid), nil)
 	if err != nil {
-		return &up, err
+		return nil, err
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36=anny")
 	req.Header.Set("Accept", "application/json, text/plain, */*")
@@ -31,18 +32,32 @@ func GetUpInfo(mid int64) (*model.BilibiliUp, error) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return &up, err
+		return nil, err
 	}
 	var data map[string]interface{}
 	if err = json.Unmarshal(body, &data); err != nil {
-		return &up, err
+		return nil, err
 	}
 	data = data["data"].(map[string]interface{})
 	if err = mapstructure.Decode(data, &up); err != nil {
-		return &up, err
+		return nil, err
 	}
-	database.DB.Create(&up)
-	return &up, nil
+
+	//替换图片url
+	if msg, err := picture.Upload(up.TopPhoto); err != nil {
+		//database.DB.Create(&up)
+		return nil, err
+	} else {
+		up.TopPhoto = msg.Data.Url
+	}
+	if msg, err := picture.Upload(up.Face); err != nil {
+		//database.DB.Create(&up)
+		return nil, err
+	} else {
+		up.Face = msg.Data.Url
+		database.DB.Create(&up)
+		return &up, nil
+	}
 }
 
 /**

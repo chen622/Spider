@@ -14,8 +14,8 @@ func GetUpInfo(ctx iris.Context) {
 	if err != nil {
 		ctx.JSON(utils.NotOk(utils.E_501()))
 	} else {
-		bilibiliUp := model.FindBilibiliUpById(upId)
-		if bilibiliUp.ID == 0 {
+		bilibiliUp, err := model.FindBilibiliUpById(upId)
+		if err != nil {
 			bilibiliUp, err := spider.GetUpInfo(upId)
 			if err != nil {
 				fmt.Println(err.Error())
