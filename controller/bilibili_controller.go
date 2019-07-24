@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"Spider/database"
 	"Spider/model"
 	"Spider/spider"
 	"Spider/utils"
@@ -10,9 +11,8 @@ import (
 )
 
 func GetUpInfo(ctx iris.Context) {
-	upId, err := strconv.ParseInt(ctx.URLParam("mid"), 10, 64)
-	if err != nil {
-		ctx.JSON(utils.NotOk(utils.E_501()))
+	if upId, err := strconv.ParseInt(ctx.URLParam("mid"), 10, 64); err != nil {
+		ctx.JSON(utils.NotOk(utils.E_401()))
 	} else {
 		bilibiliUp, err := model.FindBilibiliUpById(upId)
 		if err != nil {
@@ -26,5 +26,18 @@ func GetUpInfo(ctx iris.Context) {
 		} else {
 			ctx.JSON(utils.Ok(bilibiliUp, "获取成功"))
 		}
+	}
+}
+
+func Subscribe(ctx iris.Context) {
+	up := new(model.BilibiliUp)
+	if err := ctx.ReadJSON(&up); err != nil {
+		fmt.Println(err.Error())
+		ctx.JSON(utils.NotOk(utils.E_500()))
+	} else {
+		userId := ctx.Values().Get("userId").(uint)
+		user := &model.User{ID: userId}
+		fmt.Println(database.DB.Model(&user).Association("BilibiliUps").Append(up).Error)
+		ctx.JSON(utils.Ok(database.DB.First(&user, userId).Value, "订阅成功"))
 	}
 }

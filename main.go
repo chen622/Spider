@@ -5,6 +5,7 @@ import (
 	"Spider/controller"
 	"Spider/database"
 	"Spider/middleware"
+	"Spider/schedule"
 	"fmt"
 	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris"
@@ -49,12 +50,17 @@ func newApp() (app *iris.Application) {
 	ccm.PartyFunc("/bilibili", func(users iris.Party) {
 		users.Use(middleware.MyJwtMiddleware.Serve, middleware.AuthToken)
 		users.Get("/up", controller.GetUpInfo)
+		users.Post("/subscribe", controller.Subscribe)
 	})
 
 	return
 }
 
 func main() {
+	//schedule.New()
+	schedule.BilibiliSchedule()
+	//fmt.Println(c.AddFunc("@every 2m", func() { fmt.Println(time.Now(), "Every hour on the half hour") }))
+
 	app := newApp()
 	err := app.Run(iris.Addr(config.Conf.Get("app.port").(string)))
 	if err != nil {

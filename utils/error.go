@@ -12,6 +12,11 @@ func E_201() (err *Error) {
 	return
 }
 
+func E_401() (err *Error) {
+	err = &Error{Code: 401, Msg: "权限异常，请重新登录!"}
+	return
+}
+
 //E_402 表单验证错误
 func E_402(errMap map[string]interface{}) (err *Error) {
 	msg, _ := json.Marshal(errMap)

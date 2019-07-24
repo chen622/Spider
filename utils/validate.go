@@ -5,9 +5,9 @@ import (
 )
 
 var (
-	Validate = New()
+	Validate = NewValidate()
 )
 
-func New() *validator.Validate {
+func NewValidate() *validator.Validate {
 	return validator.New()
 }
