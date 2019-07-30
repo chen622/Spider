@@ -3,6 +3,7 @@ package mail
 import (
 	"Spider/config"
 	"Spider/model"
+	"Spider/utils"
 	"fmt"
 	"net/smtp"
 	"strings"
@@ -14,17 +15,20 @@ var (
 	host     = config.Conf.Get("email.host").(string)
 )
 
-func Bilibili(author string, list []model.BilibiliVideo) error {
+func Bilibili(subscribers []model.User, author model.BilibiliUp, list []model.BilibiliVideo) error {
 	html := ""
 	html += htmlHeader
 	for _, video := range list {
-		html += fmt.Sprintf(htmlInfo, video.Pic, video.Title, video.Description, video.Aid, video.Aid)
+		html += fmt.Sprintf(htmlInfo, video.Pic, video.Title, video.Description, video.ID, video.ID)
 	}
 	html += htmlFooter
-	//fmt.Println(html)
-	if err := SendMail(fmt.Sprint(author, " 的B站视频更新了"), html, "html"); err != nil {
-		return err
+	var errorAmount []model.User
+	for _, subscriber := range subscribers {
+		if err := SendMail(subscriber.Mail, fmt.Sprint(author.Name, " 的B站视频更新了"), html, "html"); err != nil {
+			errorAmount = append(errorAmount, subscriber)
+		}
 	}
+	utils.Logger.Info(fmt.Sprint("消息推送! 发送成功至:[]"))
 	return nil
 }
 
@@ -37,7 +41,7 @@ func Bilibili(author string, list []model.BilibiliVideo) error {
  *  body: The content of mail
  *  mailtyoe: mail type html or text
  */
-func SendMail(subject, body, mailtype string) error {
+func SendMail(to, subject, body, mailtype string) error {
 	hp := strings.Split(host, ":")
 	auth := smtp.PlainAuth("", user, password, hp[0])
 	var content_type string
@@ -53,28 +57,28 @@ func SendMail(subject, body, mailtype string) error {
 	return err
 }
 
-func main() {
-	subject := "Test send email by golang"
-
-	body := `
-    <html>
-    <body>
-    <h3>
-    "这是GO语言写的测试邮件。"
-    </h3>
-    </body>
-    </html>
-    `
-	fmt.Println("send email")
-	err := SendMail(subject, body, "html")
-	if err != nil {
-		fmt.Println("send mail error!")
-		fmt.Println(err)
-	} else {
-		fmt.Println("send mail success!")
-	}
-
-}
+//func main() {
+//	subject := "Test send email by golang"
+//
+//	body := `
+//    <html>
+//    <body>
+//    <h3>
+//    "这是GO语言写的测试邮件。"
+//    </h3>
+//    </body>
+//    </html>
+//    `
+//	fmt.Println("send email")
+//	err := SendMail(subject, body, "html")
+//	if err != nil {
+//		fmt.Println("send mail error!")
+//		fmt.Println(err)
+//	} else {
+//		fmt.Println("send mail success!")
+//	}
+//
+//}
 
 var htmlInfo = "<div style=\"background-color: #ffffff;\">\n" +
 	"                    <div class=\"layout two-col\"\n" +

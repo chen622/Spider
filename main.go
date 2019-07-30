@@ -5,6 +5,7 @@ import (
 	"Spider/controller"
 	"Spider/database"
 	"Spider/middleware"
+	"Spider/model"
 	"Spider/schedule"
 	"fmt"
 	"github.com/iris-contrib/middleware/cors"
@@ -16,11 +17,11 @@ func newApp() (app *iris.Application) {
 	app = iris.New()
 	app.Use(logger.New())
 
-	//database.DB.AutoMigrate(
-	//	&model.User{},
-	//	&model.BilibiliUp{},
-	//	&model.BilibiliVideo{},
-	//)
+	database.DB.AutoMigrate(
+		&model.User{},
+		&model.BilibiliUp{},
+		&model.BilibiliVideo{},
+	)
 
 	//"github.com/iris-contrib/middleware/cors"
 	crs := cors.New(cors.Options{
@@ -57,8 +58,8 @@ func newApp() (app *iris.Application) {
 }
 
 func main() {
-	//schedule.New()
-	schedule.BilibiliSchedule()
+	schedule.New()
+	//schedule.BilibiliSchedule()
 	//fmt.Println(c.AddFunc("@every 2m", func() { fmt.Println(time.Now(), "Every hour on the half hour") }))
 
 	app := newApp()

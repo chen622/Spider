@@ -19,7 +19,8 @@ func New() {
 }
 
 func BilibiliSchedule() {
-	utils.Logger.Errorf("RUN SCHEDULE")
+	utils.Logger.Info("RUN SCHEDULE")
+	fmt.Println("RUN SCHEDULE")
 	biliUps := []model.BilibiliUp{}
 	database.DB.Preload("Users").Find(&biliUps)
 	for _, up := range biliUps {
@@ -27,20 +28,27 @@ func BilibiliSchedule() {
 	}
 }
 
-func refreshUp(up *model.BilibiliUp) error {
+func refreshUp(up *model.BilibiliUp) {
 	hasNew := false
 	if videos, err := spider.GetVideoList(up.ID); err != nil {
-		return err
+		utils.Logger.Error(err.Error())
 	} else {
 		for _, video := range videos {
 			if database.DB.First(&model.BilibiliVideo{}, video.ID).RecordNotFound() {
-				database.DB.Model(&up).Association("BilibiliVideo").Append(video)
-				hasNew = true
+				if err := database.DB.Model(&up).Association("BilibiliVideos").Append(video).Error; err != nil {
+					utils.Logger.Error(err.Error())
+				} else {
+					hasNew = true
+				}
 			}
 		}
 		if hasNew {
+			var users []model.User
+			if err := database.DB.Model(&up).Association("Users").Find(&users).Error; err != nil {
+				utils.Logger.Error(err.Error())
+			} else {
 
+			}
 		}
-		return nil
 	}
 }

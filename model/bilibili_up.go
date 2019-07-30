@@ -9,15 +9,15 @@ import (
 type BilibiliUp struct {
 	ID             uint64           `gorm:"primary_key" mapstructure:"mid"`
 	Name           string           `gorm:"column:name" json:"name"`
-	LastTime       time.Time        `gorm:"column:last_time" json:"lastTime"`
+	LastTime       *time.Time       `gorm:"column:last_time" json:"lastTime"`
 	Face           string           `gorm:"column:face" json:"face"`
 	Sign           string           `gorm:"column:sign" json:"sign"`
 	TopPhoto       string           `gorm:"column:top_photo" json:"topPhoto" mapstructure:"top_photo"`
-	BilibiliVideos []*BilibiliVideo `gorm:"ForeignKey:Aid"`
+	BilibiliVideos []*BilibiliVideo `gorm:"foreignkey:Mid;association_foreignkey:ID"`
 	Users          []*User          `gorm:"many2many:user_bilibili_up"`
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	DeletedAt      *time.Time `sql:"index"`
+	CreatedAt      *time.Time
+	UpdatedAt      *time.Time
+	DeletedAt      *time.Time
 }
 
 //func New(id uint64, name string, face string, sign string, topPhoto string) (this *BilibiliUp) {

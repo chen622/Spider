@@ -12,8 +12,11 @@ import (
 )
 
 type Bilibili struct {
-	Status bool                   `jpath:"status"`
-	Vlist  []*model.BilibiliVideo `jpath:"data.vlist"`
+	Status bool
+	Data   struct {
+		Vlist []model.BilibiliVideo
+	}
+	Msg string
 }
 
 const bilibili_up_info = "https://api.bilibili.com/x/space/acc/info?jsonp=jsonp&mid="
@@ -69,7 +72,7 @@ func GetUpInfo(mid int64) (*model.BilibiliUp, error) {
 /**
 爬取up主的视频列表
 */
-func GetVideoList(mid uint64) (list []*model.BilibiliVideo, err error) {
+func GetVideoList(mid uint64) (list []model.BilibiliVideo, err error) {
 
 	//创建请求
 	client := &http.Client{}
@@ -86,32 +89,28 @@ func GetVideoList(mid uint64) (list []*model.BilibiliVideo, err error) {
 				return nil, err
 			} else {
 				//解析数据
-				var dat map[string]interface{}
-				if err := json.Unmarshal([]byte(body), &dat); err != nil {
+				var bilibili Bilibili
+				if err := json.Unmarshal([]byte(body), &bilibili); err != nil {
 					return nil, err
 				}
-				if dat["status"].(bool) {
-					var bilibili Bilibili
-					if err = mapstructure.Decode(dat, &bilibili); err != nil {
-						return nil, err
+				if bilibili.Status {
+					for index, video := range bilibili.Data.Vlist {
+						bilibili.Data.Vlist[index].Pic = fmt.Sprint("http:", video.Pic)
 					}
-					for index, video := range bilibili.Vlist {
-						bilibili.Vlist[index].Pic = fmt.Sprint("http:", video.Pic)
-					}
-					return bilibili.Vlist, nil
+					return bilibili.Data.Vlist, nil
 				} else {
-					return nil, SpiderError{fmt.Sprint(bilibili_video, mid), dat["msg"].(string)}
+					return nil, Error{fmt.Sprint(bilibili_video, mid), bilibili.Msg}
 				}
 			}
 		}
 	}
 }
 
-type SpiderError struct {
+type Error struct {
 	Url string
 	Msg string
 }
 
-func (err SpiderError) Error() string {
+func (err Error) Error() string {
 	return fmt.Sprintf("Error from: '%s', msg: '%s'", err.Url, err.Msg)
 }
