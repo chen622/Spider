@@ -8,6 +8,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/kataras/iris"
 	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 func Login(ctx iris.Context) {
@@ -32,38 +33,38 @@ func Login(ctx iris.Context) {
 }
 
 func Register(ctx iris.Context) {
-	ctx.JSON(utils.NotOk(utils.E_201()))
-	//user := new(model.User)
-	//if err := ctx.ReadJSON(&user); err != nil {
-	//	fmt.Println(err.Error())
-	//	ctx.JSON(utils.NotOk(utils.E_500()))
-	//} else {
-	//	err := utils.Validate.Struct(user)
-	//	if err != nil { //表单验证失败
-	//		errMap := map[string]interface{}{}
-	//		for _, err := range err.(validator.ValidationErrors) {
-	//			errMap[err.Field()] = err.ActualTag()
-	//			fmt.Println(err.Namespace())
-	//			fmt.Println(err.Field())
-	//			fmt.Println(err.Type())
-	//			fmt.Println(err.Param())
-	//			fmt.Println(err.ActualTag())
-	//		}
-	//		ctx.JSON(utils.NotOk(utils.E_402(errMap)))
-	//	} else {
-	//		oldUser := model.FindUserByUsername(user.Username)
-	//		if oldUser.ID != 0 { //用户名存在
-	//			ctx.JSON(utils.NotOk(utils.E_405()))
-	//		} else { //注册成功
-	//			u, err := model.CreateUser(user)
-	//			if err != nil {
-	//				ctx.JSON(utils.NotOk(utils.E_500()))
-	//			} else {
-	//				ctx.JSON(utils.Ok(u, "注册成功"))
-	//			}
-	//		}
-	//	}
-	//}
+	//ctx.JSON(utils.NotOk(utils.E_201()))
+	user := new(model.User)
+	if err := ctx.ReadJSON(&user); err != nil {
+		fmt.Println(err.Error())
+		ctx.JSON(utils.NotOk(utils.E_500()))
+	} else {
+		err := utils.Validate.Struct(user)
+		if err != nil { //表单验证失败
+			errMap := map[string]interface{}{}
+			for _, err := range err.(validator.ValidationErrors) {
+				errMap[err.Field()] = err.ActualTag()
+				fmt.Println(err.Namespace())
+				fmt.Println(err.Field())
+				fmt.Println(err.Type())
+				fmt.Println(err.Param())
+				fmt.Println(err.ActualTag())
+			}
+			ctx.JSON(utils.NotOk(utils.E_402(errMap)))
+		} else {
+			oldUser := model.FindUserByUsername(user.Username)
+			if oldUser.ID != 0 { //用户名存在
+				ctx.JSON(utils.NotOk(utils.E_405()))
+			} else { //注册成功
+				u, err := model.CreateUser(user)
+				if err != nil {
+					ctx.JSON(utils.NotOk(utils.E_500()))
+				} else {
+					ctx.JSON(utils.Ok(u, "注册成功"))
+				}
+			}
+		}
+	}
 }
 
 func CheckToken(ctx iris.Context) {
